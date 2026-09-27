@@ -38,7 +38,9 @@
   .store[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
   .store[aria-checked="true"] .ck{background:var(--accent);border-color:var(--accent)}
   .store[aria-checked="true"] .ck::after{content:"✓"}
-  .store[aria-disabled="true"]{opacity:.45;cursor:default}
+  .store[aria-disabled="true"]{cursor:default;background:#faf8f4}
+  .store[aria-disabled="true"] .ck{opacity:.35}
+  .store[aria-disabled="true"] .nm{color:var(--sub)}
   .store:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
   .store .bd{flex:1;min-width:0}
   .store .nm{font-weight:700;font-size:.9rem}
