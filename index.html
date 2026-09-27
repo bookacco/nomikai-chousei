@@ -17,43 +17,50 @@
   h1{font-size:1.15rem;margin:0;letter-spacing:.03em}
   .meta{color:var(--sub);font-size:.78rem}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
-  .card h2{font-size:.8rem;color:var(--sub);margin:0 0 6px;font-weight:600;display:flex;justify-content:space-between}
+  .card h2{font-size:.8rem;color:var(--sub);margin:0 0 6px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
   .card h2 a{color:var(--accent);text-decoration:none;font-weight:600}
 
-  /* ---- 集計マトリクス（調整さん風） ---- */
-  .mx{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
-  table{border-collapse:collapse;width:100%;font-size:.82rem}
-  th,td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
-  th.opt,td.opt{text-align:left;position:sticky;left:0;background:var(--card);padding-left:4px;max-width:8.5em;overflow:hidden;text-overflow:ellipsis;width:1%}
-  thead th{font-weight:600;font-size:.72rem;color:var(--sub);vertical-align:bottom}
-  thead th.p{cursor:pointer;writing-mode:vertical-rl;text-orientation:upright;letter-spacing:-.05em;padding:4px 0;line-height:1.1;font-size:.74rem;color:var(--ink)}
-  thead th.p.me{color:var(--ink);background:var(--me)}
-  td.n{font-weight:700;width:2em;font-variant-numeric:tabular-nums}
-  td.c{min-width:1.35em;color:var(--dot);font-size:.8rem;line-height:1.5}
-  td.c.me{background:var(--me)}
-  tr.grp td{background:none;border-bottom:none;padding:5px 4px 0;font-size:.68rem;color:var(--sub);text-align:left;position:static}
-  tr.lead td{background:var(--lead)}
-  tr.lead td.opt{background:var(--lead);font-weight:700}
-  tr.lead td.opt::after{content:"最多";margin-left:5px;font-size:.62rem;color:#fff;background:var(--accent);border-radius:4px;padding:1px 4px;vertical-align:1px}
-  .empty{color:var(--sub);font-size:.82rem;padding:6px 2px}
-  details.cm{margin-top:6px;font-size:.78rem;color:var(--sub)}
-  details.cm p{margin:3px 0;color:var(--ink)}
-
   /* ---- 回答フォーム ---- */
-  .f-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
   .lbl{font-size:.72rem;color:var(--sub);margin:0 0 4px}
-  input[type=text]{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:16px;background:#fff}
+  input[type=text]{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:16px;background:#fff}
+  .mb{margin-bottom:8px}
   .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
-  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
-  .opt-btn{padding:7px 3px;font-size:.8rem;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;color:var(--ink);cursor:pointer;line-height:1.25;text-align:center}
-  .opt-btn small{display:block;font-size:.66rem;color:var(--sub)}
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+  .opt-btn{position:relative;padding:7px 3px;font:inherit;font-size:.8rem;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;line-height:1.25;text-align:center}
+  .opt-btn small{display:block;font-size:.62rem;color:var(--sub);font-weight:400}
   .opt-btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
   .opt-btn:disabled{opacity:.4;cursor:default}
+  .opt-btn.add{border-style:dashed;color:var(--sub)}
+  .opt-btn .x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--sub);color:#fff;font-size:11px;line-height:18px}
+  .propose{display:flex;gap:6px;margin-bottom:8px}
+  [hidden]{display:none!important}
+  .propose button{flex-shrink:0;padding:0 12px;border:none;border-radius:9px;background:var(--ink);color:#fff;font:inherit;font-size:.82rem;cursor:pointer}
   .submit{width:100%;padding:11px;border:none;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer}
   .submit:disabled{opacity:.5}
   .msg{font-size:.78rem;min-height:1.2em;margin:6px 2px 0;color:var(--sub)}
   .msg.err{color:var(--accent)}
-  .two{display:grid;grid-template-columns:2fr 3fr;gap:6px;margin-bottom:8px}.two input{width:100%}
+
+  /* ---- 集計マトリクス（調整さん風） ---- */
+  .mx{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
+  table{border-collapse:collapse;font-size:.82rem}
+  th,td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+  th.opt,td.opt{text-align:left;position:sticky;left:0;z-index:1;background:var(--card);padding-left:4px;padding-right:6px;min-width:7.5em}
+  thead th{font-weight:600;font-size:.72rem;color:var(--sub);vertical-align:bottom}
+  thead th.p{cursor:pointer;writing-mode:vertical-rl;text-orientation:upright;padding:4px 0;line-height:1.9em;font-size:.74rem;color:var(--ink);width:1.9em}
+  thead th.p.me{background:var(--me)}
+  td.n{width:2.6em;font-weight:700;font-variant-numeric:tabular-nums}
+  td.c{min-width:1.7em;color:var(--dot);font-size:.8rem;line-height:1.5}
+  td.c.me{background:var(--me)}
+  td.opt small{color:var(--sub);font-size:.62rem;margin-left:3px}
+  tr.grp td{border-bottom:none;padding:5px 4px 0;font-size:.68rem;color:var(--sub);text-align:left;background:none}
+  tr.lead td{background:var(--lead)}
+  tr.lead td.opt{background:var(--lead);font-weight:700}
+  tr.lead td.n span{display:inline-block;min-width:1.7em;border-radius:9px;background:var(--accent);color:#fff;padding:0 5px}
+  .legend{font-size:.66rem;color:var(--sub);margin:4px 2px 0}
+  .legend b{display:inline-block;background:var(--accent);color:#fff;border-radius:9px;padding:0 5px;font-weight:700}
+  .empty{color:var(--sub);font-size:.82rem;padding:6px 2px}
+  details.cm{margin-top:6px;font-size:.78rem;color:var(--sub)}
+  details.cm p{margin:3px 0;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -63,28 +70,31 @@
     <span class="meta" id="note"></span>
   </header>
 
-  <!-- 集計（開いた瞬間に見える） -->
-  <section class="card" aria-labelledby="h-sum">
-    <h2 id="h-sum"><span id="sumHead">集計</span><a href="#" id="reload">更新</a></h2>
-    <div class="mx"><table id="mx"></table></div>
-    <p class="empty" id="empty" hidden>まだ回答がありません。最初のひとりになってください。</p>
-    <details class="cm" id="cm" hidden><summary>ひとこと</summary><div id="cmBody"></div></details>
-  </section>
-
   <!-- 回答 -->
   <form class="card" id="form" autocomplete="off">
     <h2><span>回答する</span><span id="editHint"></span></h2>
-    <div class="two">
-      <input type="text" id="name" maxlength="12" placeholder="お名前" aria-label="お名前" required>
-      <input type="text" id="comment" maxlength="60" placeholder="ひとこと（任意）" aria-label="ひとこと">
-    </div>
+    <input type="text" class="mb" id="name" maxlength="12" placeholder="お名前" aria-label="お名前" required>
     <p class="lbl">希望月（1つ）</p>
     <div class="seg" id="months" role="group" aria-label="希望月"></div>
     <p class="lbl" id="themeLbl">企画（2つまで）</p>
     <div class="chips" id="themes" role="group" aria-label="企画"></div>
+    <div class="propose" id="propose" hidden>
+      <input type="text" id="propText" maxlength="15" placeholder="新しい企画（15字まで）" aria-label="新しい企画">
+      <button type="button" id="propAdd">追加</button>
+    </div>
+    <input type="text" class="mb" id="comment" maxlength="60" placeholder="ひとこと（任意）" aria-label="ひとこと">
     <button class="submit" id="submitBtn" type="submit">送信</button>
     <p class="msg" id="msg"></p>
   </form>
+
+  <!-- 集計 -->
+  <section class="card" aria-labelledby="h-sum">
+    <h2 id="h-sum"><span id="sumHead">集計</span><a href="#" id="reload">更新</a></h2>
+    <div class="mx"><table id="mx"></table></div>
+    <p class="legend" id="legend" hidden><b>n</b> は最多。名前をタップするとその人の回答を修正できます</p>
+    <p class="empty" id="empty" hidden>まだ回答がありません。最初のひとりになってください。</p>
+    <details class="cm" id="cm" hidden><summary>ひとこと</summary><div id="cmBody"></div></details>
+  </section>
 </main>
 
 <script>
@@ -97,6 +107,7 @@ const CONFIG = {
   gasUrl: 'https://script.google.com/macros/s/AKfycbzu8293sbxov-a57vOzF-87gfbK8R_BxIwDwX_A1kvSAuNVtAlV8jVOFBMzOAlEM_rw/exec',
   months: ['11月', '12月', '1月'],
   maxThemes: 2,
+  maxProposals: 12,
   themes: [
     { name: '焼き鳥はしご', note: '' },
     { name: '鍋パ', note: '' },
@@ -112,56 +123,26 @@ const KEY = '希望月';               // GAS側の列名（日付:希望月）
 const $ = (id) => document.getElementById(id);
 const store = { get(k){ try{return JSON.parse(localStorage.getItem(k))}catch(e){return null} },
                 set(k,v){ try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} } };
-let answers = store.get('nomikai:cache') || [];
+const cache = store.get('nomikai:cache2') || {};
+let answers = cache.answers || [];
+let proposals = cache.proposals || [];     // [{name, by}]
+let pending = [];                           // この画面で追加した未送信の提案
 let myName = store.get('nomikai:me') || '';
 let pickMonth = '', pickThemes = [];
 
 document.title = CONFIG.title;
 $('title').textContent = CONFIG.title;
 $('note').textContent = CONFIG.note;
-$('themeLbl').textContent = `企画（${CONFIG.maxThemes}つまで）`;
+$('themeLbl').textContent = `企画（${CONFIG.maxThemes}つまで・追加提案OK）`;
 
-/* ---------- 集計マトリクス ---------- */
-function renderSummary() {
-  const people = answers.slice().sort((a, b) => a.updatedAt < b.updatedAt ? -1 : 1);
-  const t = $('mx'); t.innerHTML = '';
-  $('empty').hidden = people.length > 0;
-  $('sumHead').textContent = people.length ? `集計（${people.length}人回答）` : '集計';
-  if (!people.length) { $('cm').hidden = true; return; }
-
-  const head = t.createTHead().insertRow();
-  head.appendChild(th('', 'opt')); head.appendChild(th('計'));
-  people.forEach(p => {
-    const h = th([...p.name].slice(0, 4).join(''), 'p' + (p.name === myName ? ' me' : ''));
-    h.title = `${p.name}の回答を編集`;
-    h.onclick = () => loadInto(p.name);
-    head.appendChild(h);
-  });
-
-  const body = t.createTBody();
-  const group = (label) => { const r = body.insertRow(); r.className = 'grp'; const c = r.insertCell(); c.colSpan = people.length + 2; c.textContent = label; };
-  const rows = (opts, has) => {
-    const counts = opts.map(o => people.filter(p => has(p, o)).length);
-    const max = Math.max(...counts);
-    opts.forEach((o, i) => {
-      const r = body.insertRow();
-      if (max > 0 && counts[i] === max) r.className = 'lead';
-      const c0 = r.insertCell(); c0.className = 'opt'; c0.textContent = o;
-      const cn = r.insertCell(); cn.className = 'n'; cn.textContent = counts[i];
-      people.forEach(p => { const c = r.insertCell(); c.className = 'c' + (p.name === myName ? ' me' : ''); c.textContent = has(p, o) ? '●' : ''; });
-    });
-  };
-  group('希望月');
-  rows(CONFIG.months, (p, m) => p.dates[KEY] === m);
-  group(`企画（${CONFIG.maxThemes}つまで）`);
-  rows(CONFIG.themes.map(x => x.name), (p, n) => p.themes.includes(n));
-
-  const cs = people.filter(p => p.comment);
-  $('cm').hidden = !cs.length;
-  $('cmBody').innerHTML = '';
-  cs.forEach(p => { const e = document.createElement('p'); e.textContent = `${p.name}：${p.comment}`; $('cmBody').appendChild(e); });
+/* 企画一覧 = 既定 ＋ 提案済み ＋ 未送信の提案 */
+function allThemes(withPending) {
+  const list = CONFIG.themes.map(t => ({ ...t }));
+  const has = (n) => list.some(t => t.name === n);
+  proposals.forEach(p => { if (!has(p.name)) list.push({ name: p.name, note: `${p.by}さん提案` }); });
+  if (withPending) pending.forEach(n => { if (!has(n)) list.push({ name: n, note: '提案（送信で確定）', pending: true }); });
+  return list;
 }
-function th(text, cls) { const e = document.createElement('th'); e.textContent = text; if (cls) e.className = cls; return e; }
 
 /* ---------- フォーム ---------- */
 function renderForm() {
@@ -171,30 +152,56 @@ function renderForm() {
     b.onclick = () => { pickMonth = m; renderForm(); };
     $('months').appendChild(b);
   });
+
   $('themes').innerHTML = '';
   const full = pickThemes.length >= CONFIG.maxThemes;
-  CONFIG.themes.forEach(t => {
+  const themes = allThemes(true);
+  themes.forEach(t => {
     const on = pickThemes.includes(t.name);
     const b = btn(t.name, t.note); b.setAttribute('aria-pressed', on);
     b.disabled = full && !on;
     b.onclick = () => { pickThemes = on ? pickThemes.filter(x => x !== t.name) : pickThemes.concat(t.name); renderForm(); };
+    if (t.pending) {
+      const x = document.createElement('span'); x.className = 'x'; x.textContent = '×'; x.setAttribute('aria-label', '提案を取り消す');
+      x.onclick = (e) => { e.stopPropagation(); pending = pending.filter(n => n !== t.name); pickThemes = pickThemes.filter(n => n !== t.name); renderForm(); };
+      b.appendChild(x); b.disabled = false;
+    }
     $('themes').appendChild(b);
   });
+  if (themes.length < CONFIG.themes.length + CONFIG.maxProposals) {
+    const add = btn('＋ 企画を提案'); add.classList.add('add');
+    add.onclick = () => { $('propose').hidden = false; $('propText').focus(); };
+    $('themes').appendChild(add);
+  }
 }
 function btn(label, note) {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'opt-btn'; b.textContent = label;
   if (note) { const s = document.createElement('small'); s.textContent = note; b.appendChild(s); }
   return b;
 }
+
+function addProposal() {
+  const t = $('propText').value.trim().slice(0, 15);
+  if (!t) return;
+  if (allThemes(true).some(x => x.name === t)) { say('同じ企画がすでにあります', true); return; }
+  pending.push(t);
+  if (pickThemes.length < CONFIG.maxThemes) pickThemes.push(t);
+  $('propText').value = ''; $('propose').hidden = true; say('');
+  renderForm();
+}
+$('propAdd').onclick = addProposal;
+$('propText').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addProposal(); } });
+
 function loadInto(name, noScroll) {
   const p = answers.find(a => a.name === name);
   $('name').value = name;
   pickMonth = p ? (p.dates[KEY] || '') : '';
-  pickThemes = p ? p.themes.filter(n => CONFIG.themes.some(t => t.name === n)).slice(0, CONFIG.maxThemes) : [];
+  const names = allThemes(false).map(t => t.name);
+  pickThemes = p ? p.themes.filter(n => names.includes(n)).slice(0, CONFIG.maxThemes) : [];
   $('comment').value = p ? (p.comment || '') : '';
   $('editHint').textContent = p ? `${name}さんの回答を修正中` : '';
   renderForm();
-  if (p && !noScroll) $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (p && !noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 $('name').addEventListener('change', () => {
   const n = $('name').value.trim();
@@ -203,26 +210,73 @@ $('name').addEventListener('change', () => {
 
 $('form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (document.activeElement === $('propText')) return;
   const name = $('name').value.trim();
   if (!name) return say('お名前を入れてください', true);
   if (!pickMonth) return say('希望月を1つ選んでください', true);
-  const payload = { name, dates: { [KEY]: pickMonth }, themes: pickThemes, comment: $('comment').value.trim() };
+  const payload = { name, dates: { [KEY]: pickMonth }, themes: pickThemes, proposals: pending, comment: $('comment').value.trim() };
   $('submitBtn').disabled = true; say('送信中…');
   try {
     const res = await fetch(CONFIG.gasUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
     const json = await res.json();
     if (!json.ok) throw new Error(json.error || '送信に失敗しました');
-    answers = json.answers; store.set('nomikai:cache', answers);
+    answers = json.answers; proposals = json.proposals || proposals; pending = [];
+    store.set('nomikai:cache2', { answers, proposals });
     myName = name; store.set('nomikai:me', name);
-    renderSummary();
+    renderForm(); renderSummary();
     $('editHint').textContent = `${name}さんの回答を修正中`;
     say('送信しました。ありがとう！');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $('h-sum').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
     say('送信できませんでした：' + err.message, true);
   } finally { $('submitBtn').disabled = false; }
 });
 function say(t, err) { $('msg').textContent = t; $('msg').classList.toggle('err', !!err); }
+
+/* ---------- 集計マトリクス ---------- */
+function renderSummary() {
+  const people = answers.slice().sort((a, b) => a.updatedAt < b.updatedAt ? -1 : 1);
+  const t = $('mx'); t.innerHTML = '';
+  $('empty').hidden = people.length > 0;
+  $('legend').hidden = people.length === 0;
+  $('sumHead').textContent = people.length ? `集計（${people.length}人回答）` : '集計';
+  if (!people.length) { $('cm').hidden = true; return; }
+
+  const head = t.createTHead().insertRow();
+  head.appendChild(th('', 'opt')); head.appendChild(th('計'));
+  people.forEach(p => {
+    const h = th([...p.name].slice(0, 4).join(''), 'p' + (p.name === myName ? ' me' : ''));
+    h.title = `${p.name}の回答を修正`;
+    h.onclick = () => loadInto(p.name);
+    head.appendChild(h);
+  });
+
+  const body = t.createTBody();
+  const group = (label) => { const r = body.insertRow(); r.className = 'grp'; const c = r.insertCell(); c.colSpan = people.length + 2; c.textContent = label; };
+  const rows = (opts, has) => {
+    const counts = opts.map(o => people.filter(p => has(p, o.name)).length);
+    const max = Math.max(...counts);
+    opts.forEach((o, i) => {
+      const r = body.insertRow();
+      if (max > 0 && counts[i] === max) r.className = 'lead';
+      const c0 = r.insertCell(); c0.className = 'opt'; c0.textContent = o.name;
+      if (o.by) { const s = document.createElement('small'); s.textContent = '提案'; c0.appendChild(s); }
+      const cn = r.insertCell(); cn.className = 'n';
+      const sp = document.createElement('span'); sp.textContent = counts[i]; cn.appendChild(sp);
+      people.forEach(p => { const c = r.insertCell(); c.className = 'c' + (p.name === myName ? ' me' : ''); c.textContent = has(p, o.name) ? '●' : ''; });
+    });
+  };
+  group('希望月');
+  rows(CONFIG.months.map(m => ({ name: m })), (p, m) => p.dates[KEY] === m);
+  group(`企画（${CONFIG.maxThemes}つまで）`);
+  rows(allThemes(false).map(x => ({ name: x.name, by: !CONFIG.themes.some(c => c.name === x.name) })), (p, n) => p.themes.includes(n));
+
+  const cs = people.filter(p => p.comment);
+  $('cm').hidden = !cs.length;
+  $('cmBody').innerHTML = '';
+  cs.forEach(p => { const e = document.createElement('p'); e.textContent = `${p.name}：${p.comment}`; $('cmBody').appendChild(e); });
+}
+function th(text, cls) { const e = document.createElement('th'); e.textContent = text; if (cls) e.className = cls; return e; }
 
 /* ---------- 読み込み ---------- */
 async function load() {
@@ -230,16 +284,16 @@ async function load() {
   try {
     const res = await fetch(CONFIG.gasUrl);
     const json = await res.json();
-    answers = json.answers || []; store.set('nomikai:cache', answers);
+    answers = json.answers || []; proposals = json.proposals || [];
+    store.set('nomikai:cache2', { answers, proposals });
   } catch (err) { say('集計を読み込めませんでした。「更新」を押してください', true); }
   renderSummary();
-  if (myName && !$('name').value) loadInto(myName, true);
+  if (myName && !$('editHint').textContent) loadInto(myName, true); else renderForm();
 }
 $('reload').onclick = (e) => { e.preventDefault(); load(); };
 
-renderSummary();      // キャッシュを即表示
-renderForm();
-if (myName) loadInto(myName, true);
+renderSummary();      // 前回の集計を即表示
+if (myName) loadInto(myName, true); else renderForm();
 load();
 </script>
 </body>
