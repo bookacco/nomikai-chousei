@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>飲み会調整</title>
+<style>
+  :root{
+    --bg:#f6f3ee; --card:#fffdf9; --ink:#2b2622; --sub:#7a7068; --line:#e4ddd3;
+    --accent:#b5442e; --accent-soft:#f6e3dd;
+    --ok:#2f7d5b; --ok-soft:#dff0e7; --maybe:#b58a1e; --maybe-soft:#f6ecd0; --ng:#8b8580; --ng-soft:#ece9e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+  main{max-width:640px;margin:0 auto;padding:24px 16px 64px}
+  header h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:.04em}
+  header p{margin:0;color:var(--sub);font-size:.9rem;white-space:pre-line}
+  .tabs{display:flex;gap:8px;margin:20px 0 16px}
+  .tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);border-radius:10px;
+    font:inherit;font-weight:600;color:var(--sub);cursor:pointer}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px;margin-bottom:14px}
+  h2{font-size:1rem;margin:0 0 4px}
+  .hint{font-size:.8rem;color:var(--sub);margin:0 0 12px}
+  input[type=text],textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+  textarea{min-height:64px;resize:vertical}
+  .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+  .row:first-of-type{border-top:none}
+  .row .label{flex:1;font-weight:600}
+  .seg{display:flex;gap:6px}
+  .seg button{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:1.05rem;cursor:pointer;color:var(--sub)}
+  .seg button[aria-pressed="true"][data-v="○"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+  .seg button[aria-pressed="true"][data-v="△"]{background:var(--maybe-soft);border-color:var(--maybe);color:var(--maybe);font-weight:700}
+  .seg button[aria-pressed="true"][data-v="×"]{background:var(--ng-soft);border-color:var(--ng);color:var(--ng);font-weight:700}
+  .themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .theme{display:block;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative}
+  .theme input{position:absolute;opacity:0;pointer-events:none}
+  .theme b{display:block}
+  .theme small{color:var(--sub);font-size:.78rem}
+  .theme:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  .theme:has(input:checked) b::before{content:"♥ ";color:var(--accent)}
+  .theme:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+  .submit{width:100%;padding:14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-weight:700;font-size:1rem;cursor:pointer}
+  .submit:disabled{opacity:.5;cursor:default}
+  .msg{margin:10px 0 0;font-size:.9rem;min-height:1.4em}
+  .msg.err{color:var(--accent)}
+  .notice{font-size:.8rem;background:var(--maybe-soft);border-radius:10px;padding:8px 12px;margin-top:12px}
+  /* results */
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;font-size:.85rem;min-width:100%}
+  th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+  tr.best td{background:var(--ok-soft)}
+  tr.best td:first-child{background:var(--ok-soft);font-weight:700}
+  .c-ok{color:var(--ok);font-weight:700}.c-maybe{color:var(--maybe);font-weight:700}.c-ng{color:var(--ng)}
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 0}
+  .bar .name{width:9em;flex-shrink:0;font-weight:600}
+  .bar .track{display:block;flex:1;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+  .bar .fill{display:block;height:100%;background:var(--accent)}
+  .bar .n{width:2.5em;text-align:right;font-variant-numeric:tabular-nums}
+  .who{font-size:.75rem;color:var(--sub);padding-left:9em;margin-top:-6px}
+  .comments p{margin:6px 0;font-size:.88rem}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1 id="title"></h1>
+    <p id="note"></p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-form" aria-selected="true">回答する</button>
+    <button role="tab" id="tab-result" aria-selected="false">集計を見る</button>
+  </div>
+
+  <!-- 回答フォーム -->
+  <form id="form" autocomplete="off">
+    <section class="card">
+      <h2>お名前</h2>
+      <p class="hint">同じ名前で送り直すと、前の回答が上書きされます。</p>
+      <input type="text" id="name" maxlength="20" required placeholder="例：いの">
+      <p class="msg" id="nameMsg"></p>
+    </section>
+
+    <section class="card">
+      <h2>日程</h2>
+      <p class="hint">○ 参加できる　△ 未定・調整すれば　× 無理</p>
+      <div id="dates"></div>
+    </section>
+
+    <section class="card">
+      <h2>企画テーマ</h2>
+      <p class="hint">やってみたいものを全部タップ（いくつでもOK）</p>
+      <div class="themes" id="themes"></div>
+    </section>
+
+    <section class="card">
+      <h2>ひとこと（任意）</h2>
+      <textarea id="comment" maxlength="200" placeholder="遅れて参加します、など"></textarea>
+    </section>
+
+    <button class="submit" id="submitBtn" type="submit">回答を送る</button>
+    <p class="msg" id="formMsg"></p>
+    <p class="notice" id="demoNotice" hidden>デモモードです（GAS_URL 未設定）。回答はこの画面を閉じると消えます。</p>
+  </form>
+
+  <!-- 集計 -->
+  <div id="result" hidden>
+    <section class="card">
+      <h2>日程</h2>
+      <p class="hint" id="dateHint"></p>
+      <div class="tablewrap"><table id="dateTable"></table></div>
+    </section>
+    <section class="card">
+      <h2>企画テーマ</h2>
+      <div id="themeBars"></div>
+    </section>
+    <section class="card comments" id="commentsCard" hidden>
+      <h2>ひとこと</h2>
+      <div id="comments"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* =========================================================
+   ここだけ書き換えればOK
+   ========================================================= */
+const CONFIG = {
+  title: '秋の飲み会',
+  note:  '候補日と、やってみたい企画を教えてください。\n締切：10/5（日）',
+  // GASをデプロイしたら、ウェブアプリのURLをここに貼る（空欄ならデモモード）
+  gasUrl: '',
+  dates: [
+    '10/17(金) 19:00〜',
+    '10/18(土) 18:00〜',
+    '10/24(金) 19:00〜',
+    '10/25(土) 18:00〜',
+  ],
+  themes: [
+    { name: '焼き鳥はしご', note: '先斗町あたりで2軒' },
+    { name: '鍋パ', note: '誰かの家で' },
+    { name: '日本酒の飲み比べ', note: '' },
+    { name: 'ジビエ', note: '' },
+    { name: '屋台・立ち飲み', note: '' },
+  ],
+};
+/* ========================================================= */
+
+const MARKS = ['○', '△', '×'];
+const SCORE = { '○': 2, '△': 1, '×': 0 };
+const $ = (id) => document.getElementById(id);
+const demo = !CONFIG.gasUrl;
+let answers = [];           // [{name, dates:{日付:○△×}, themes:[...], comment, updatedAt}]
+let picks = {};             // 入力中の日付回答
+
+document.title = CONFIG.title;
+$('title').textContent = CONFIG.title;
+$('note').textContent = CONFIG.note;
+if (demo) $('demoNotice').hidden = false;
+
+/* ---------- フォーム描画 ---------- */
+function renderForm() {
+  $('dates').innerHTML = '';
+  CONFIG.dates.forEach((d) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span class="label"></span><div class="seg" role="group"></div>`;
+    row.querySelector('.label').textContent = d;
+    const seg = row.querySelector('.seg');
+    seg.setAttribute('aria-label', d);
+    MARKS.forEach((m) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = m; b.dataset.v = m;
+      b.setAttribute('aria-pressed', picks[d] === m);
+      b.onclick = () => { picks[d] = m; seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); };
+      seg.appendChild(b);
+    });
+    $('dates').appendChild(row);
+  });
+
+  $('themes').innerHTML = '';
+  CONFIG.themes.forEach((t, i) => {
+    const l = document.createElement('label');
+    l.className = 'theme';
+    l.innerHTML = `<input type="checkbox" value=""><b></b><small></small>`;
+    l.querySelector('input').value = t.name;
+    l.querySelector('b').textContent = t.name;
+    l.querySelector('small').textContent = t.note || '';
+    $('themes').appendChild(l);
+  });
+}
+
+/* 既存の名前を入れたら前回回答を復元 */
+$('name').addEventListener('change', () => {
+  const n = $('name').value.trim();
+  const prev = answers.find(a => a.name === n);
+  if (!prev) { $('nameMsg').textContent = ''; return; }
+  picks = { ...prev.dates };
+  renderForm();
+  document.querySelectorAll('#themes input').forEach(c => c.checked = prev.themes.includes(c.value));
+  $('comment').value = prev.comment || '';
+  $('nameMsg').textContent = '前回の回答を読み込みました。修正して送り直せます。';
+});
+
+/* ---------- 送信 ---------- */
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = $('name').value.trim();
+  const missing = CONFIG.dates.filter(d => !picks[d]);
+  if (!name) return showMsg('お名前を入れてください', true);
+  if (missing.length) return showMsg(`日程が未回答です：${missing.join('、')}`, true);
+
+  const payload = {
+    name,
+    dates: Object.fromEntries(CONFIG.dates.map(d => [d, picks[d]])),
+    themes: [...document.querySelectorAll('#themes input:checked')].map(c => c.value),
+    comment: $('comment').value.trim(),
+  };
+
+  $('submitBtn').disabled = true;
+  showMsg('送信中…');
+  try {
+    if (demo) {
+      answers = answers.filter(a => a.name !== name).concat({ ...payload, updatedAt: new Date().toISOString() });
+    } else {
+      // text/plain にすると GAS へ CORS プリフライトなしで送れる
+      const res = await fetch(CONFIG.gasUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || '送信に失敗しました');
+      answers = json.answers;
+    }
+    showMsg('送信しました。ありがとう！');
+    switchTab('result');
+  } catch (err) {
+    showMsg('送信できませんでした：' + err.message, true);
+  } finally {
+    $('submitBtn').disabled = false;
+  }
+});
+
+function showMsg(t, isErr) { $('formMsg').textContent = t; $('formMsg').classList.toggle('err', !!isErr); }
+
+/* ---------- 集計 ---------- */
+async function load() {
+  if (demo) return;
+  try {
+    const res = await fetch(CONFIG.gasUrl);
+    const json = await res.json();
+    answers = json.answers || [];
+  } catch (err) {
+    $('dateHint').textContent = '集計を読み込めませんでした。時間をおいて再読み込みしてください。';
+  }
+}
+
+function renderResult() {
+  const people = answers.slice().sort((a, b) => a.updatedAt < b.updatedAt ? -1 : 1);
+  $('dateHint').textContent = people.length ? `${people.length}人が回答（○=2点・△=1点で集計、緑が最有力）` : 'まだ回答がありません';
+
+  // 日程テーブル
+  const stats = CONFIG.dates.map(d => {
+    const vals = people.map(p => p.dates[d] || '');
+    return { d, vals, ok: vals.filter(v => v === '○').length, maybe: vals.filter(v => v === '△').length,
+             ng: vals.filter(v => v === '×').length, score: vals.reduce((s, v) => s + (SCORE[v] || 0), 0) };
+  });
+  const best = Math.max(...stats.map(s => s.ng === 0 ? s.score : -1));
+  const t = $('dateTable');
+  t.innerHTML = '';
+  const head = t.insertRow();
+  ['日程', '○', '△', '×', ...people.map(p => p.name)].forEach(h => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
+  stats.forEach(s => {
+    const r = t.insertRow();
+    if (people.length && s.ng === 0 && s.score === best) r.className = 'best';
+    [s.d, s.ok, s.maybe, s.ng, ...s.vals].forEach((v, i) => {
+      const c = r.insertCell(); c.textContent = v;
+      if (i >= 4) c.className = v === '○' ? 'c-ok' : v === '△' ? 'c-maybe' : 'c-ng';
+    });
+  });
+
+  // テーマ
+  const max = Math.max(1, people.length);
+  const ranked = CONFIG.themes.map(t => ({ name: t.name, who: people.filter(p => p.themes.includes(t.name)).map(p => p.name) }))
+                              .sort((a, b) => b.who.length - a.who.length);
+  $('themeBars').innerHTML = '';
+  ranked.forEach(t => {
+    const el = document.createElement('div');
+    el.innerHTML = `<div class="bar"><span class="name"></span><span class="track"><span class="fill"></span></span><span class="n"></span></div><div class="who"></div>`;
+    el.querySelector('.name').textContent = t.name;
+    el.querySelector('.fill').style.width = (t.who.length / max * 100) + '%';
+    el.querySelector('.n').textContent = t.who.length;
+    el.querySelector('.who').textContent = t.who.join('、');
+    $('themeBars').appendChild(el);
+  });
+
+  // コメント
+  const cs = people.filter(p => p.comment);
+  $('commentsCard').hidden = !cs.length;
+  $('comments').innerHTML = '';
+  cs.forEach(p => { const el = document.createElement('p'); el.textContent = `${p.name}：${p.comment}`; $('comments').appendChild(el); });
+}
+
+/* ---------- タブ ---------- */
+function switchTab(which) {
+  const isForm = which === 'form';
+  $('tab-form').setAttribute('aria-selected', isForm);
+  $('tab-result').setAttribute('aria-selected', !isForm);
+  $('form').hidden = !isForm;
+  $('result').hidden = isForm;
+  if (!isForm) renderResult();
+}
+$('tab-form').onclick = () => { showMsg(''); switchTab('form'); };
+$('tab-result').onclick = async () => { await load(); switchTab('result'); };
+
+renderForm();
+load();
+</script>
+</body>
+</html>
