@@ -32,6 +32,21 @@
   .opt-btn:disabled{opacity:.4;cursor:default}
   .opt-btn.add{border-style:dashed;color:var(--sub)}
   .opt-btn .x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--sub);color:#fff;font-size:11px;line-height:18px}
+  .stores{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+  .store{position:relative;display:flex;gap:8px;align-items:flex-start;padding:7px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .store .ck{flex-shrink:0;width:18px;height:18px;border:1.5px solid #cfc6ba;border-radius:5px;margin-top:1px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+  .store[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .store[aria-checked="true"] .ck{background:var(--accent);border-color:var(--accent)}
+  .store[aria-checked="true"] .ck::after{content:"✓"}
+  .store[aria-disabled="true"]{opacity:.45;cursor:default}
+  .store:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .store .bd{flex:1;min-width:0}
+  .store .nm{font-weight:700;font-size:.9rem}
+  .store .nm small{font-weight:400;font-size:.66rem;color:var(--sub);margin-left:6px}
+  .store a{font-size:.68rem;color:var(--accent);margin-left:6px;white-space:nowrap}
+  .store p{margin:2px 0 0;font-size:.72rem;color:var(--sub);line-height:1.45}
+  .store .x{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--sub);color:#fff;font-size:12px;line-height:20px;text-align:center}
+  .add-store{width:100%;padding:8px;border:1px dashed #cfc6ba;border-radius:9px;background:none;color:var(--sub);font:inherit;font-size:.8rem;cursor:pointer;margin-bottom:6px}
   .propose{display:flex;gap:6px;margin-bottom:8px}
   [hidden]{display:none!important}
   .propose button{flex-shrink:0;padding:0 12px;border:none;border-radius:9px;background:var(--ink);color:#fff;font:inherit;font-size:.82rem;cursor:pointer}
@@ -74,12 +89,13 @@
   <form class="card" id="form" autocomplete="off">
     <h2><span>回答する</span><span id="editHint"></span></h2>
     <input type="text" class="mb" id="name" maxlength="12" placeholder="お名前" aria-label="お名前" required>
-    <p class="lbl">希望月（1つ）</p>
+    <p class="lbl" id="monthLbl">希望月（2つまで）</p>
     <div class="seg" id="months" role="group" aria-label="希望月"></div>
-    <p class="lbl" id="themeLbl">企画（2つまで）</p>
-    <div class="chips" id="themes" role="group" aria-label="企画"></div>
+    <p class="lbl" id="themeLbl">お店（2つまで）</p>
+    <div class="stores" id="themes" role="group" aria-label="お店"></div>
+    <button type="button" class="add-store" id="addStore">＋ ほかのお店を提案</button>
     <div class="propose" id="propose" hidden>
-      <input type="text" id="propText" maxlength="15" placeholder="新しい企画（15字まで）" aria-label="新しい企画">
+      <input type="text" id="propText" maxlength="15" placeholder="お店の名前（15字まで）" aria-label="提案するお店">
       <button type="button" id="propAdd">追加</button>
     </div>
     <input type="text" class="mb" id="comment" maxlength="60" placeholder="ひとこと（任意）" aria-label="ひとこと">
@@ -106,15 +122,19 @@ const CONFIG = {
   note:  '締切 10/12（日）',
   gasUrl: 'https://script.google.com/macros/s/AKfycbzu8293sbxov-a57vOzF-87gfbK8R_BxIwDwX_A1kvSAuNVtAlV8jVOFBMzOAlEM_rw/exec',
   months: ['11月', '12月', '1月'],
+  maxMonths: 2,
   maxThemes: 2,
   maxProposals: 12,
+  // 候補のお店（name は集計・スプレッドシートの列名になるので、公開後は変えないこと）
   themes: [
-    { name: '焼き鳥はしご', note: '' },
-    { name: '鍋パ', note: '' },
-    { name: '日本酒飲み比べ', note: '' },
-    { name: 'ジビエ', note: '' },
-    { name: '立ち飲み', note: '' },
-    { name: '忘年会カラオケ', note: '' },
+    { name: '対馬', link: 'https://tabelog.com/kyoto/A2601/A260203/26023270/', linkLabel: '食べログ',
+      desc: '猪口の推し店。旬の刺身、焼魚、白子、寒鰤など、その日の良い魚を豪快に楽しめる海鮮酒場。冬の日本酒会には特に強い一軒。' },
+    { name: '中華料理 千龍', link: 'https://tabelog.com/kyoto/A2601/A260203/26007658/', linkLabel: '食べログ',
+      desc: '四条大宮が誇る実力派町中華。焼売、麻婆豆腐、炒飯まで大皿で遠慮なく攻めたい。気取らないのに料理はしっかり旨い、飲み会向きの名店。' },
+    { name: 'ふる里', link: 'https://tabelog.com/kyoto/A2601/A260203/26009446/', linkLabel: '食べログ',
+      desc: '駅前ビルの3階に潜む、四条大宮らしさ全開のディープ酒場。刺身、おでん、煮物から季節の果物サワーまで、メニューを眺めるだけでも楽しい。' },
+    { name: '月夜にコメと酒', link: 'https://www.instagram.com/t.kome_sake/', linkLabel: 'Instagram',
+      desc: '食堂×酒場。旬の肴と日本酒、最後は羽釜炊きの銀シャリ。老舗系とは違う「今の四条大宮」を感じる良酒場。料理が丁寧で、落ち着いて飲みたい夜にも◎。' },
   ],
 };
 /* ========================================================= */
@@ -128,18 +148,20 @@ let answers = cache.answers || [];
 let proposals = cache.proposals || [];     // [{name, by}]
 let pending = [];                           // この画面で追加した未送信の提案
 let myName = store.get('nomikai:me') || '';
-let pickMonth = '', pickThemes = [];
+let pickMonths = [], pickThemes = [];
+const splitM = (v) => String(v || '').split(',').filter(Boolean);
 
 document.title = CONFIG.title;
 $('title').textContent = CONFIG.title;
 $('note').textContent = CONFIG.note;
-$('themeLbl').textContent = `企画（${CONFIG.maxThemes}つまで・追加提案OK）`;
+$('monthLbl').textContent = `希望月（${CONFIG.maxMonths}つまで）`;
+$('themeLbl').textContent = `お店（${CONFIG.maxThemes}つまで）`;
 
 /* 企画一覧 = 既定 ＋ 提案済み ＋ 未送信の提案 */
 function allThemes(withPending) {
   const list = CONFIG.themes.map(t => ({ ...t }));
   const has = (n) => list.some(t => t.name === n);
-  proposals.forEach(p => { if (!has(p.name)) list.push({ name: p.name, note: `${p.by}さん提案` }); });
+  proposals.forEach(p => { if (!has(p.name)) list.push({ name: p.name, note: `${p.by}さん提案`, proposed: true }); });
   if (withPending) pending.forEach(n => { if (!has(n)) list.push({ name: n, note: '提案（送信で確定）', pending: true }); });
   return list;
 }
@@ -147,9 +169,12 @@ function allThemes(withPending) {
 /* ---------- フォーム ---------- */
 function renderForm() {
   $('months').innerHTML = '';
+  const mFull = pickMonths.length >= CONFIG.maxMonths;
   CONFIG.months.forEach(m => {
-    const b = btn(m); b.setAttribute('aria-pressed', pickMonth === m);
-    b.onclick = () => { pickMonth = m; renderForm(); };
+    const on = pickMonths.includes(m);
+    const b = btn(m); b.setAttribute('aria-pressed', on);
+    b.disabled = mFull && !on;
+    b.onclick = () => { pickMonths = on ? pickMonths.filter(x => x !== m) : pickMonths.concat(m); renderForm(); };
     $('months').appendChild(b);
   });
 
@@ -158,22 +183,34 @@ function renderForm() {
   const themes = allThemes(true);
   themes.forEach(t => {
     const on = pickThemes.includes(t.name);
-    const b = btn(t.name, t.note); b.setAttribute('aria-pressed', on);
-    b.disabled = full && !on;
-    b.onclick = () => { pickThemes = on ? pickThemes.filter(x => x !== t.name) : pickThemes.concat(t.name); renderForm(); };
+    const off = full && !on;
+    const el = document.createElement('div');
+    el.className = 'store'; el.tabIndex = 0;
+    el.setAttribute('role', 'checkbox'); el.setAttribute('aria-checked', on); el.setAttribute('aria-disabled', off);
+    el.innerHTML = '<span class="ck"></span><div class="bd"><div class="nm"></div></div>';
+    const nm = el.querySelector('.nm'); nm.textContent = t.name;
+    if (t.note) { const sm = document.createElement('small'); sm.textContent = t.note; nm.appendChild(sm); }
+    if (t.link) {
+      const a = document.createElement('a'); a.href = t.link; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = (t.linkLabel || 'リンク') + ' ↗'; a.onclick = (e) => e.stopPropagation(); nm.appendChild(a);
+    }
+    if (t.desc) { const d = document.createElement('p'); d.textContent = t.desc; el.querySelector('.bd').appendChild(d); }
+    const toggle = () => {
+      if (!on && full) return;
+      pickThemes = on ? pickThemes.filter(x => x !== t.name) : pickThemes.concat(t.name); renderForm();
+    };
+    el.onclick = toggle;
+    el.onkeydown = (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } };
     if (t.pending) {
       const x = document.createElement('span'); x.className = 'x'; x.textContent = '×'; x.setAttribute('aria-label', '提案を取り消す');
       x.onclick = (e) => { e.stopPropagation(); pending = pending.filter(n => n !== t.name); pickThemes = pickThemes.filter(n => n !== t.name); renderForm(); };
-      b.appendChild(x); b.disabled = false;
+      el.appendChild(x);
     }
-    $('themes').appendChild(b);
+    $('themes').appendChild(el);
   });
-  if (themes.length < CONFIG.themes.length + CONFIG.maxProposals) {
-    const add = btn('＋ 企画を提案'); add.classList.add('add');
-    add.onclick = () => { $('propose').hidden = false; $('propText').focus(); };
-    $('themes').appendChild(add);
-  }
+  $('addStore').hidden = themes.length >= CONFIG.themes.length + CONFIG.maxProposals;
 }
+$('addStore').onclick = () => { $('propose').hidden = false; $('propText').focus(); };
 function btn(label, note) {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'opt-btn'; b.textContent = label;
   if (note) { const s = document.createElement('small'); s.textContent = note; b.appendChild(s); }
@@ -183,7 +220,7 @@ function btn(label, note) {
 function addProposal() {
   const t = $('propText').value.trim().slice(0, 15);
   if (!t) return;
-  if (allThemes(true).some(x => x.name === t)) { say('同じ企画がすでにあります', true); return; }
+  if (allThemes(true).some(x => x.name === t)) { say('同じお店がすでにあります', true); return; }
   pending.push(t);
   if (pickThemes.length < CONFIG.maxThemes) pickThemes.push(t);
   $('propText').value = ''; $('propose').hidden = true; say('');
@@ -195,7 +232,7 @@ $('propText').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.pr
 function loadInto(name, noScroll) {
   const p = answers.find(a => a.name === name);
   $('name').value = name;
-  pickMonth = p ? (p.dates[KEY] || '') : '';
+  pickMonths = p ? splitM(p.dates[KEY]).filter(m => CONFIG.months.includes(m)).slice(0, CONFIG.maxMonths) : [];
   const names = allThemes(false).map(t => t.name);
   pickThemes = p ? p.themes.filter(n => names.includes(n)).slice(0, CONFIG.maxThemes) : [];
   $('comment').value = p ? (p.comment || '') : '';
@@ -213,8 +250,8 @@ $('form').addEventListener('submit', async (e) => {
   if (document.activeElement === $('propText')) return;
   const name = $('name').value.trim();
   if (!name) return say('お名前を入れてください', true);
-  if (!pickMonth) return say('希望月を1つ選んでください', true);
-  const payload = { name, dates: { [KEY]: pickMonth }, themes: pickThemes, proposals: pending, comment: $('comment').value.trim() };
+  if (!pickMonths.length) return say('希望月を選んでください', true);
+  const payload = { name, dates: { [KEY]: CONFIG.months.filter(m => pickMonths.includes(m)).join(',') }, themes: pickThemes, proposals: pending, comment: $('comment').value.trim() };
   $('submitBtn').disabled = true; say('送信中…');
   try {
     const res = await fetch(CONFIG.gasUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
@@ -266,9 +303,9 @@ function renderSummary() {
       people.forEach(p => { const c = r.insertCell(); c.className = 'c' + (p.name === myName ? ' me' : ''); c.textContent = has(p, o.name) ? '●' : ''; });
     });
   };
-  group('希望月');
-  rows(CONFIG.months.map(m => ({ name: m })), (p, m) => p.dates[KEY] === m);
-  group(`企画（${CONFIG.maxThemes}つまで）`);
+  group(`希望月（${CONFIG.maxMonths}つまで）`);
+  rows(CONFIG.months.map(m => ({ name: m })), (p, m) => splitM(p.dates[KEY]).includes(m));
+  group(`お店（${CONFIG.maxThemes}つまで）`);
   rows(allThemes(false).map(x => ({ name: x.name, by: !CONFIG.themes.some(c => c.name === x.name) })), (p, n) => p.themes.includes(n));
 
   const cs = people.filter(p => p.comment);
